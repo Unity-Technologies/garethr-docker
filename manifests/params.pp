@@ -37,20 +37,11 @@ class docker::params {
   $docker_group_default         = 'docker'
   case $::osfamily {
     'Debian' : {
-      case $::operatingsystem {
-        'Ubuntu' : {
-          $package_name   = $package_name_default
-          $service_name   = $service_name_default
-          $docker_command = $docker_command_default
-        }
-        default: {
-          $package_name   = 'docker.io'
-          $service_name   = 'docker.io'
-          $docker_command = 'docker.io'
-        }
-      }
+      $package_name = $package_name_default
+      $service_name = $service_name_default
+      $docker_command = $docker_command_default
       $docker_group = $docker_group_default
-      $package_source_location     = 'https://get.docker.io/ubuntu'
+      $package_source_location = 'https://get.docker.io/ubuntu'
       $use_upstream_package_source = true
       $detach_service_in_init = true
     }
