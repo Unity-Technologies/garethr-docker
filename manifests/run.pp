@@ -7,7 +7,7 @@
 # [*restart*]
 # Sets a restart policy on the docker run.
 # Note: If set, puppet will NOT setup an init script to manage, instead
-# it will do a raw docker run command using a CID file to track the container 
+# it will do a raw docker run command using a CID file to track the container
 # ID.
 #
 # If you want a normal named container with an init script and a restart policy
@@ -131,12 +131,20 @@ define docker::run(
 
     case $::osfamily {
       'Debian': {
-        $initscript = "/etc/init.d/docker-${sanitised_title}"
-        $init_template = 'docker/etc/init.d/docker-run.erb'
-        $deprecated_initscript = "/etc/init/docker-${sanitised_title}.conf"
-        $hasstatus  = true
-        $uses_systemd = false
-        $mode = '0755'
+        if versioncmp($::operatingsystemrelease, '8.0') < 0 {
+          $initscript = "/etc/init.d/docker-${sanitised_title}"
+          $init_template = 'docker/etc/init.d/docker-run.erb'
+          $deprecated_initscript = "/etc/init/docker-${sanitised_title}.conf"
+          $hasstatus  = true
+          $uses_systemd = false
+          $mode = '0755'
+        } else {
+          $initscript    = "/etc/systemd/system/docker-${sanitised_title}.service"
+          $init_template = 'docker/etc/systemd/system/docker-run.erb'
+          $hasstatus     = true
+          $mode          = '0644'
+          $uses_systemd  = true
+        }
       }
       'RedHat': {
         if versioncmp($::operatingsystemrelease, '7.0') < 0 {

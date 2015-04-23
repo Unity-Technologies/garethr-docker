@@ -44,6 +44,12 @@ class docker::params {
       $package_source_location = 'https://get.docker.io/ubuntu'
       $use_upstream_package_source = true
       $detach_service_in_init = true
+
+      if $::operatingsystem == 'Debian' {
+        if versioncmp($::operatingsystemrelease, '8.0') >= 0 {
+          include docker::systemd_reload
+        }
+      }
     }
     'RedHat' : {
       if $::operatingsystem == 'Fedora' {
