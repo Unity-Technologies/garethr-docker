@@ -196,16 +196,24 @@ define docker::run(
       File[$initscript]
     }
 
-    service { "docker-${sanitised_title}":
-      ensure    => $running,
-      enable    => true,
-      hasstatus => $hasstatus,
-      require   => File[$initscript],
-    }
-
     if $uses_systemd {
+      service { "docker-${sanitised_title}":
+        ensure    => $running,
+        enable    => true,
+        hasstatus => $hasstatus,
+        provider  => 'systemd',
+        require   => File[$initscript],
+      }
+
       File[$initscript] ~> Exec['docker-systemd-reload']
       Exec['docker-systemd-reload'] -> Service["docker-${sanitised_title}"]
+    } else {
+      service { "docker-${sanitised_title}":
+        ensure    => $running,
+        enable    => true,
+        hasstatus => $hasstatus,
+        require   => File[$initscript],
+      }
     }
 
     if $restart_service {
